@@ -5,7 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "babel-node ./src/index.js",
-    "start:dev": "nodemon --exec babel-node ./src/index.js"
+    "start:dev": "nodemon --exec babel-node ./src/index.js",
+    "db:migrate:dev": "sequelize db:migrate --env development",
+    "db:migrate:undo:dev": " sequelize db:migrate:undo:all --env development",
+    "db:reset:dev": "npm run db:migrate:undo:dev && npm run db:migrate:dev",
+    "db:migrate:test": "sequelize db:migrate --env test",
+    "db:migrate:undo:test": " sequelize db:migrate:undo:all --env test",
+    "db:reset:test": "npm run db:migrate:undo:test && npm run db:migrate:test",
+    "seed:dev": "npm run db:reset:dev && sequelize db:seed:all"
   },
   "keywords": [],
   "author": "",
