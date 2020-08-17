@@ -1,0 +1,105 @@
+{
+  "name": "cybersource-gate-way",
+  "version": "1.0.0",
+  "description": "TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "start": "babel-node ./src/index.js",
+    "start:dev": "nodemon --exec babel-node ./src/index.js",
+    "db:migrate:dev": "sequelize db:migrate --env development",
+    "db:migrate:undo:dev": " sequelize db:migrate:undo:all --env development",
+    "db:reset:dev": "npm run db:migrate:undo:dev && npm run db:migrate:dev",
+    "db:migrate:test": "sequelize db:migrate --env test",
+    "db:migrate:undo:test": " sequelize db:migrate:undo:all --env test",
+    "db:reset:test": "npm run db:migrate:undo:test && npm run db:migrate:test",
+    "seed:dev": "npm run db:reset:dev && sequelize db:seed:all"
+  },
+  "jest": {
+    "collectCoverage": false
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.9.6",
+    "@hapi/joi": "^17.1.1",
+    "axios": "^0.19.2",
+    "babel-eslint": "^10.1.0",
+    "bcrypt": "^3.0.8",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "credit-card-type": "^8.3.0",
+    "cross-env": "^7.0.0",
+    "cybersource-rest-client": "^0.0.16",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^3.22.0",
+    "http-status": "^1.4.2",
+    "interswitch": "^2.1.7",
+    "jsonwebtoken": "^8.5.1",
+    "jwk-to-pem": "^2.0.3",
+    "leasot": "^11.0.0",
+    "morgan": "^1.9.1",
+    "mysql2": "^2.1.0",
+    "passport-jwt": "^4.0.0",
+    "paymentsdk": "^1.0.2",
+    "pg": "^7.18.1",
+    "pg-hstore": "^2.3.3",
+    "randomatic": "^3.1.1",
+    "sendgrid": "^5.2.3",
+    "sequelize": "^5.21.7",
+    "socket.io": "^2.3.0",
+    "swagger-jsdoc": "^4.0.0",
+    "swagger-ui-express": "^4.1.4",
+    "twilio": "^3.43.0",
+    "uuid": "^7.0.3",
+    "validator": "^13.0.0",
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.4",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/polyfill": "^7.8.3",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/register": "^7.8.3",
+    "apidoc": "^0.22.1",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.7.0",
+    "esm": "^3.2.25",
+    "husky": "^4.2.3",
+    "jest": "^25.5.4",
+    "jsdoc": "^3.6.4",
+    "lint-staged": "^10.2.2",
+    "nodemon": "^2.0.2",
+    "rm": "^0.1.8",
+    "sequelize-cli": "^5.5.1",
+    "sqlite3": "^4.2.0",
+    "supertest": "^4.0.2",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "lint-staged": {
+    "src/**/*.{js}": [
+      "eslint . --fix",
+      "npm run test"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "lint": "npm run lint ",
+      "pre-commit": "lint-staged",
+      "pre-push": "lint-staged"
+    }
+  },
+  "directories": {
+    "test": "test"
+  }
+}
