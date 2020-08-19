@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const db = require('./database/models');
-import server from './server';
+import { server } from './server';
 
 const { log } = console;
 const PORT = process.env.PORT || 3300;
@@ -11,7 +11,7 @@ dbconnection
   .authenticate()
   .then(async () => {
     log('connection to database successful');
-    server.server.listen(PORT, () => {
+    server.listen(PORT, () => {
       const { log } = console;
       log(`*** server running on port ${PORT} ***`);
     });
