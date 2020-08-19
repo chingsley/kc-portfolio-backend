@@ -14,14 +14,16 @@ module.exports = {
         firstName: 'kingsley',
         lastName: 'eneja',
         email: 'eneja.kc@gmail.com',
+        username: 'enejakc',
         password,
         image:
           'https://res.cloudinary.com/dmx0a3nqi/image/upload/t_media_lib_thumb/v1571040003/gbart8vc5ervfmccdqlm.png',
       },
       {
-        firstName: 'chiamaka',
-        lastName: 'eneja',
-        email: 'enejapeacemc@gmail.com',
+        firstName: 'kelvin',
+        lastName: 'esegbona',
+        email: 'kesegbona@gmail.com',
+        username: 'kesegbona',
         password,
       },
     ]);

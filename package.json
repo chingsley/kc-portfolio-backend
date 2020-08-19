@@ -15,7 +15,7 @@
     "db:migrate:test": "sequelize db:migrate --env test",
     "db:migrate:undo:test": " sequelize db:migrate:undo:all --env test",
     "db:reset:test": "npm run db:migrate:undo:test && npm run db:migrate:test",
-    "seed:dev": "npm run db:reset:dev && sequelize db:seed:all"
+    "seed": "npm run db:reset:dev && sequelize db:seed:all"
   },
   "jest": {
     "collectCoverage": false
