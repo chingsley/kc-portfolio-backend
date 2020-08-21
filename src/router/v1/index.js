@@ -1,7 +1,7 @@
 import express from 'express';
 
 import rolesRoutes from './rolesRoutes';
-import usersRoutes from './userRoutes';
+import usersRoutes from '../../resources/user/user.route';
 
 const router = express.Router();
 

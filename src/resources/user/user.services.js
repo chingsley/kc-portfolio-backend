@@ -1,25 +1,42 @@
-// export default class UserService {
-//   static async registerUser(req, res, next) {
-//     try {
-//       const { email, username } = req.body;
-//       let user = await UserService.findBy({ email });
-//       if (user) {
-//         return res.status(409).json({
-//           error: `email ${email} already exists. Duplicate email is not allowed`,
-//         });
-//       }
+import db from '../../database/models';
 
-//       user = await UserService.findBy({ username });
-//       if (user) {
-//         return res.status(409).json({
-//           error: `username ${username} already exists. Please choose another username`,
-//         });
-//       }
-//       // await UserService.rejectDuplicateEmail(req, res);
-//       // await UserService.rejectDuplicateUsername(req, res);
-//       // await UserService.addUser(req.body)
-//     } catch (error) {
-//       return next(error.message);
-//     }
-//   }
-// }
+export default class UserService {
+  constructor(req, res) {
+    this.req = req;
+    this.res = res;
+  }
+
+  async createUser(newUser) {
+    await this.rejectDuplicateEmail(newUser.email);
+    await this.rejectDuplicateUsername(newUser.username);
+    return await db.User.create(newUser);
+  }
+
+  async rejectDuplicateEmail(email) {
+    const user = await this.findBy('email', email);
+    if (user) {
+      throw new Error(
+        JSON.stringify({
+          status: 409,
+          err: `email ${email} already exists. Duplicate email is not allowed`,
+        })
+      );
+    }
+  }
+
+  async rejectDuplicateUsername(username) {
+    const user = await this.findBy('username', username);
+    if (user) {
+      throw new Error(
+        JSON.stringify({
+          status: 409,
+          err: `username ${username} already exists. Duplicate username is not allowed`,
+        })
+      );
+    }
+  }
+
+  findBy(field, value) {
+    return db.User.findOne({ where: { [field]: value } });
+  }
+}
