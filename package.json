@@ -1,5 +1,5 @@
 {
-  "name": "cybersource-gate-way",
+  "name": "kc_portfolio_services",
   "version": "1.0.0",
   "description": "TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.",
   "keywords": [],
@@ -15,7 +15,9 @@
     "db:migrate:test": "sequelize db:migrate --env test",
     "db:migrate:undo:test": " sequelize db:migrate:undo:all --env test",
     "db:reset:test": "npm run db:migrate:undo:test && npm run db:migrate:test",
-    "seed": "npm run db:reset:dev && sequelize db:seed:all"
+    "seed": "npm run db:reset:dev && sequelize db:seed:all",
+    "test:watchAll": "cross-env NODE_ENV=test jest --detectOpenHandles --watchAll",
+    "test": "npm run db:reset:test && cross-env NODE_ENV=test jest --detectOpenHandles --watch"
   },
   "jest": {
     "collectCoverage": false

@@ -30,7 +30,7 @@ export default class Notification {
     this.username = null;
   }
   start() {
-    log('Notification class started');
+    // log('Notification class started');
     this.io.use(verifyAdminSocket).on('connection', (socket) => {
       log(
         `${socket.decoded.username} connected to cybersource socket successfully`
