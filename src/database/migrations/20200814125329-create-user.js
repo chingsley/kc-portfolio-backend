@@ -32,6 +32,11 @@ module.exports = {
       image: {
         type: Sequelize.TEXT,
       },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
