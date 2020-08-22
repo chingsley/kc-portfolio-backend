@@ -6,6 +6,7 @@ import db from '../../../src/database/models';
 import server from '../../../src/server';
 
 import { sampleUsers } from '../../data.samples/users.samples';
+import UserController from '../../../src/resources/user/user.controller';
 
 const app = supertest(server.server);
 
@@ -83,6 +84,39 @@ describe('UserController', () => {
         } catch (e) {
           done(e);
         }
+      });
+      it('returns 409 error for duplicate email', async (done) => {
+        try {
+          const res = await app
+            .post('/api/v1/users')
+            .send({ ...sampleUsers[1], email: sampleUsers[0].email });
+          expect(res.status).toBe(409);
+          expect(res.body).toHaveProperty('error');
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      it('returns 409 error for duplicate username', async (done) => {
+        try {
+          const res = await app
+            .post('/api/v1/users')
+            .send({ ...sampleUsers[1], username: sampleUsers[0].username });
+          expect(res.status).toBe(409);
+          expect(res.body).toHaveProperty('error');
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+    describe('catch', () => {
+      it('catches errors in the catch block', () => {
+        const req = undefined;
+        const res = { body: {} };
+        const next = jest.fn();
+        UserController.registerUser(req, res, next);
+        expect(next).toHaveBeenCalled();
       });
     });
   });
