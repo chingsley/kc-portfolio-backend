@@ -18,7 +18,8 @@
     "seed": "npm run db:reset:dev && sequelize db:seed:all",
     "test:watchAll": "cross-env NODE_ENV=test jest --detectOpenHandles --watchAll",
     "test": "npm run db:reset:test && cross-env NODE_ENV=test jest --detectOpenHandles --watch",
-    "coverage": "npm run db:reset:test && cross-env DB_ENV=test jest --detectOpenHandles --verbose --coverage --forceExit"
+    "coverage": "npm run db:reset:test && cross-env DB_ENV=test jest --detectOpenHandles --verbose --coverage --forceExit",
+    "test:userMiddleware": "jest test/resources/user/user.middleware.spec.js --detectOpenHandles --verbose --watch"
   },
   "dependencies": {
     "@babel/runtime": "^7.9.6",
