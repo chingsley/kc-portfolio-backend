@@ -17,10 +17,8 @@
     "db:reset:test": "npm run db:migrate:undo:test && npm run db:migrate:test",
     "seed": "npm run db:reset:dev && sequelize db:seed:all",
     "test:watchAll": "cross-env NODE_ENV=test jest --detectOpenHandles --watchAll",
-    "test": "npm run db:reset:test && cross-env NODE_ENV=test jest --detectOpenHandles --watch"
-  },
-  "jest": {
-    "collectCoverage": false
+    "test": "npm run db:reset:test && cross-env NODE_ENV=test jest --detectOpenHandles --watch",
+    "coverage": "npm run db:reset:test && cross-env DB_ENV=test jest --detectOpenHandles --verbose --coverage --forceExit"
   },
   "dependencies": {
     "@babel/runtime": "^7.9.6",
@@ -89,6 +87,21 @@
     "webpack-cli": "^3.3.10",
     "webpack-node-externals": "^1.7.2"
   },
+  "jest": {
+    "collectCoverage": false,
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/",
+      "<rootDir>/build/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/dist/",
+      "<rootDir>/node_modules/",
+      "<rootDir>/src/utils/",
+      "<rootDir>/test/",
+      "<rootDir>/src/server.js",
+      "<rootDir>/src/database/models/index.js"
+    ]
+  },
   "lint-staged": {
     "src/**/*.{js}": [
       "eslint . --fix",
@@ -98,8 +111,7 @@
   "husky": {
     "hooks": {
       "lint": "npm run lint ",
-      "pre-commit": "lint-staged",
-      "pre-push": "lint-staged"
+      "pre-commit": "npm run coverage"
     }
   },
   "directories": {
