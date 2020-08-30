@@ -63,19 +63,13 @@ module.exports = (sequelize, DataTypes) => {
       as: 'role',
     });
   };
-  User.addHook('beforeValidate', async (user) => {
-    if (!user.roleId) {
-      const [userRole] = await user.sequelize.models.Role.findOrCreate({
-        where: { name: 'user' },
-      });
-      user.roleId = userRole.id;
-    }
-  });
+
   User.addHook('beforeCreate', async (user) => {
     if (user.password) {
       user.password = bcrypt.hashSync(user.password, Number(BCRYPT_SALT));
     }
   });
+
   User.addHook('beforeBulkCreate', async (users) => {
     for (let i = 0; i < users.length; i++) {
       if (users[i].dataValues.password) {
@@ -84,13 +78,6 @@ module.exports = (sequelize, DataTypes) => {
           Number(BCRYPT_SALT)
         );
       }
-      // // run test to see if this block works
-      // if (!users[i].dataValues.roleId) {
-      //   const userRole = await users[i].sequelize.models.Role.findOrCreate({
-      //     where: { name: 'user' },
-      //   });
-      //   users[i].dataValues.roleId = userRole.id;
-      // }
     }
   });
   return User;
