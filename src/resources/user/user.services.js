@@ -9,12 +9,13 @@ export default class UserService {
   async createUser(newUser) {
     await this.rejectDuplicateEmail(newUser.email);
     await this.rejectDuplicateUsername(newUser.username);
+    newUser.roleId = await this.getRoleId('user');
     return await db.User.create(newUser);
   }
 
   async rejectDuplicateEmail(email) {
     const user = await this.findBy('email', email);
-    if (user) {
+    if (user && `${this.req.params.id}` !== `${user.id}`) {
       throw new Error(
         JSON.stringify({
           status: 409,
@@ -26,7 +27,7 @@ export default class UserService {
 
   async rejectDuplicateUsername(username) {
     const user = await this.findBy('username', username);
-    if (user) {
+    if (user && `${this.req.params.id}` !== `${user.id}`) {
       throw new Error(
         JSON.stringify({
           status: 409,
@@ -41,5 +42,17 @@ export default class UserService {
       where: { [field]: value },
       include: [{ model: db.Project, as: 'projects' }],
     });
+  }
+
+  async getRoleId(roleName) {
+    const [role] = await db.Role.findOrCreate({
+      where: { name: roleName },
+    });
+
+    if (!role) {
+      throw new Error(`role name ${roleName} does not exist`);
+    }
+
+    return role.id;
   }
 }

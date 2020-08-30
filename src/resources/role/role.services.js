@@ -6,15 +6,13 @@ export default class RoleService {
     this.res = res;
   }
 
-  async remove(id) {
-    const role = await this.findOne(id);
-    await role.destroy();
-    return true;
+  async create(newRole) {
+    await this.rejectDuplicateRole(newRole.name);
+    return db.Role.create(newRole);
   }
 
   async update(id, changes) {
     await this.rejectDuplicateRole(changes.name);
-
     const role = await this.findOne(id);
     await role.update(changes);
     return role;
@@ -31,6 +29,12 @@ export default class RoleService {
       );
     }
     return role;
+  }
+
+  async remove(id) {
+    const role = await this.findOne(id);
+    await role.destroy();
+    return true;
   }
 
   findBy(field, value) {
