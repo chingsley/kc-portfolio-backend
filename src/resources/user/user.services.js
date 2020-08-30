@@ -37,6 +37,9 @@ export default class UserService {
   }
 
   findBy(field, value) {
-    return db.User.findOne({ where: { [field]: value } });
+    return db.User.findOne({
+      where: { [field]: value },
+      include: [{ model: db.Project, as: 'projects' }],
+    });
   }
 }
