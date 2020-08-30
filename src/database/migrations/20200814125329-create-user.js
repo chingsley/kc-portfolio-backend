@@ -19,6 +19,7 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true,
         allowNull: false,
+        isEmail: true,
       },
       username: {
         type: Sequelize.STRING,
@@ -36,6 +37,16 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
+      },
+      roleId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Roles',
+          key: 'id',
+        },
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE',
       },
       createdAt: {
         allowNull: false,

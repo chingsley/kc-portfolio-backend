@@ -1,6 +1,7 @@
 import UserService from './user.services';
+import AppController from '../app/app.controller';
 
-export default class UserController {
+export default class UserController extends AppController {
   static async registerUser(req, res, next) {
     try {
       const userService = new UserService(req, res);
@@ -10,15 +11,6 @@ export default class UserController {
         .json({ message: 'account successfully created', data: user });
     } catch (error) {
       UserController.handleError(error, req, res, next);
-    }
-  }
-
-  static handleError(error, req, res, next) {
-    try {
-      const { status, err } = JSON.parse(error.message);
-      return res.status(status).json({ error: err });
-    } catch (e) {
-      return next(error.message);
     }
   }
 }

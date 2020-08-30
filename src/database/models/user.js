@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
+        validate: {
+          isEmail: true,
+        },
       },
       username: {
         type: DataTypes.STRING,
@@ -37,6 +40,16 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false,
       },
+      roleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Roles',
+          key: 'id',
+        },
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE',
+      },
     },
     {}
   );
@@ -45,18 +58,23 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'userId',
       as: 'projects',
     });
+    User.belongsTo(models.Role, {
+      foreignKey: 'roleId',
+      as: 'role',
+    });
   };
+  User.addHook('beforeValidate', async (user) => {
+    if (!user.roleId) {
+      const [userRole] = await user.sequelize.models.Role.findOrCreate({
+        where: { name: 'user' },
+      });
+      user.roleId = userRole.id;
+    }
+  });
   User.addHook('beforeCreate', async (user) => {
     if (user.password) {
       user.password = bcrypt.hashSync(user.password, Number(BCRYPT_SALT));
     }
-    // if (!user.roleId) {
-    //   const [userRole] = await user.sequelize.models.Role.findOrCreate({
-    //     where: { role: 'user' },
-    //   });
-
-    //   user.roleId = userRole.id;
-    // }
   });
   User.addHook('beforeBulkCreate', async (users) => {
     for (let i = 0; i < users.length; i++) {
@@ -69,7 +87,7 @@ module.exports = (sequelize, DataTypes) => {
       // // run test to see if this block works
       // if (!users[i].dataValues.roleId) {
       //   const userRole = await users[i].sequelize.models.Role.findOrCreate({
-      //     where: { role: 'user' },
+      //     where: { name: 'user' },
       //   });
       //   users[i].dataValues.roleId = userRole.id;
       // }
