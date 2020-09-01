@@ -5,6 +5,11 @@ import UserMiddleware from './user.middleware';
 
 const router = express.Router();
 
-router.post('/', UserMiddleware.validateNewUser, UserController.registerUser);
+router.post(
+  '/',
+  UserMiddleware.validateNewUser,
+  UserMiddleware.validateImageUpload,
+  UserController.registerUser
+);
 
 export default router;

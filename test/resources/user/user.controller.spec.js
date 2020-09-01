@@ -16,10 +16,12 @@ describe('UserController', () => {
   });
 
   describe('registerUser', () => {
-    let res, user;
+    let res,
+      user,
+      sampleUser = sampleUsers[1];
     beforeAll(async () => {
-      res = await app.post('/api/v1/users').send(sampleUsers[0]);
-      const { email } = sampleUsers[0];
+      res = await app.post('/api/v1/users').send(sampleUser);
+      const { email } = sampleUser;
       user = await db.User.findOne({
         where: { email },
       });
@@ -27,7 +29,7 @@ describe('UserController', () => {
     describe('try', () => {
       it('creates a new user in the database', async (done) => {
         try {
-          const { firstName, lastName, email, username } = sampleUsers[0];
+          const { firstName, lastName, email, username } = sampleUser;
 
           expect(user.dataValues).toEqual(
             expect.objectContaining({
@@ -52,7 +54,7 @@ describe('UserController', () => {
       });
       it('returns the user data in response body', async (done) => {
         try {
-          const { firstName, lastName, email, username } = sampleUsers[0];
+          const { firstName, lastName, email, username } = sampleUser;
           const { data } = res.body;
           expect(data).toEqual(
             expect.objectContaining({
@@ -77,7 +79,7 @@ describe('UserController', () => {
       });
       it('it correctly hashes the user password', async (done) => {
         try {
-          const { password } = sampleUsers[0];
+          const { password } = sampleUser;
           const isValidPassword = bcrypt.compareSync(password, user.password);
           expect(isValidPassword).toBe(true);
           done();
@@ -89,7 +91,7 @@ describe('UserController', () => {
         try {
           const res = await app
             .post('/api/v1/users')
-            .send({ ...sampleUsers[1], email: sampleUsers[0].email });
+            .send({ ...sampleUsers[1], email: sampleUser.email });
           expect(res.status).toBe(409);
           expect(res.body).toHaveProperty('error');
           done();
@@ -101,7 +103,7 @@ describe('UserController', () => {
         try {
           const res = await app
             .post('/api/v1/users')
-            .send({ ...sampleUsers[1], username: sampleUsers[0].username });
+            .send({ ...sampleUsers[1], username: sampleUser.username });
           expect(res.status).toBe(409);
           expect(res.body).toHaveProperty('error');
           done();

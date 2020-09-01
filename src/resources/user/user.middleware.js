@@ -1,10 +1,11 @@
 import Joi from '@hapi/joi';
 import { validateSchema } from '../helpers';
+import AppMiddleware from '../app/app.middleware';
 
 export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
 export const USERNAME_REGEX = /^[a-zA-Z0-9_-]*$/;
 
-export default class UserMiddleware {
+export default class UserMiddleware extends AppMiddleware {
   static async validateNewUser(req, res, next) {
     try {
       const newUserSchema = Joi.object({

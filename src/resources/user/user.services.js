@@ -1,4 +1,5 @@
 import db from '../../database/models';
+import Cloudinary from '../../utils/Cloudinary';
 
 export default class UserService {
   constructor(req, res) {
@@ -10,7 +11,10 @@ export default class UserService {
     await this.rejectDuplicateEmail(newUser.email);
     await this.rejectDuplicateUsername(newUser.username);
     newUser.roleId = await this.getRoleId('user');
-    return await db.User.create(newUser);
+    newUser.image = this.req.files
+      ? await Cloudinary.uploadImage(this.req.files)
+      : newUser.image;
+    return db.User.create(newUser);
   }
 
   async rejectDuplicateEmail(email) {
