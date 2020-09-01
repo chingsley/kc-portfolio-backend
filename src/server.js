@@ -1,18 +1,19 @@
-const express = require('express');
-const morgan = require('morgan');
-const fs = require('fs');
-const path = require('path');
-const cors = require('cors');
-const helmet = require('helmet');
-const swaggerUi = require('swagger-ui-express');
+import express from 'express';
+import fileUpload from 'express-fileupload';
+import morgan from 'morgan';
+import fs from 'fs';
+import path from 'path';
+import cors from 'cors';
+import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 import http from 'http';
 
 import Notif from './utils/Notification';
 
-const bodyParser = require('body-parser');
-const dotenv = require('dotenv');
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 
-const swaggerDoc = require('./swagger.json');
+import swaggerDoc from './swagger.json';
 
 import routes from './router';
 
@@ -23,16 +24,20 @@ server.use(helmet());
 server.use(cors());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
+server.use(
+  fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+    useTempFiles: true,
+    tempFileDir: '/tmp/',
+  })
+);
 
 server.use(
   morgan('dev', {
     skip: () => (process.env.NODE_ENV === 'test' ? true : false),
   })
 );
-server.use(express.static(path.join(__dirname, '../doc')));
-server.use(express.static(path.join(__dirname, '../dev-doc')));
 
-// log all requests to logger.log
 if (process.env.NODE_ENV === 'production') {
   const date = new Date();
   const filename =
@@ -62,12 +67,6 @@ server.use((error, req, res, next) => {
 });
 
 server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-server.all('/doc', function (req, res) {
-  res.sendFile(path.join(__dirname, '../doc/index.html'));
-});
-server.all('/dev-doc', function (req, res) {
-  res.sendFile(path.join(__dirname, '../dev-doc/index.html'));
-});
 
 server.all(['/', '/ping'], function (req, res) {
   res.status(200).json('success');

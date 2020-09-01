@@ -6,12 +6,10 @@ export default class UserController extends AppController {
     try {
       const userService = new UserService(req, res);
       const user = await userService.createUser(req.body);
-      return res
-        .status(201)
-        .json({
-          message: 'account successfully created',
-          data: { ...user.dataValues, password: undefined },
-        });
+      return res.status(201).json({
+        message: 'account successfully created',
+        data: { ...user.dataValues, password: undefined },
+      });
     } catch (error) {
       UserController.handleError(error, req, res, next);
     }
