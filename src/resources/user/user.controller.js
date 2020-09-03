@@ -14,4 +14,16 @@ export default class UserController extends AppController {
       UserController.handleError(error, req, res, next);
     }
   }
+  static async getAllUsers(req, res, next) {
+    try {
+      const userService = new UserService(req, res);
+      const data = await userService.fetchAllUsers();
+      return res.status(201).json({
+        message: 'successful',
+        data,
+      });
+    } catch (error) {
+      UserController.handleError(error, req, res, next);
+    }
+  }
 }
