@@ -12,4 +12,6 @@ router.post(
   UserController.registerUser
 );
 
+router.get('/', UserController.getAllUsers);
+
 export default router;

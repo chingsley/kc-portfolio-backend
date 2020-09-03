@@ -1,10 +1,10 @@
 import db from '../../database/models';
 import Cloudinary from '../../utils/Cloudinary';
+import AppService from '../app/app.service';
 
-export default class UserService {
+export default class UserService extends AppService {
   constructor(req, res) {
-    this.req = req;
-    this.res = res;
+    super(req, res);
   }
 
   async createUser(newUser) {
@@ -15,6 +15,20 @@ export default class UserService {
       ? await Cloudinary.uploadImage(this.req.files)
       : newUser.image;
     return db.User.create(newUser);
+  }
+
+  async fetchAllUsers() {
+    return db.User.findAndCountAll({
+      attributes: { exclude: ['password'] },
+      where: {
+        ...this.filterBy(['firstName', 'lastName', 'username', 'email']),
+      },
+      ...this.paginate(),
+      include: [
+        { model: db.Role, as: 'role', attributes: ['name'] },
+        { model: db.Project, as: 'projects' },
+      ],
+    });
   }
 
   async rejectDuplicateEmail(email) {
