@@ -17,7 +17,7 @@ export default class UserService extends AppService {
     return db.User.create(newUser);
   }
 
-  async fetchAllUsers() {
+  fetchAllUsers() {
     return db.User.findAndCountAll({
       attributes: { exclude: ['password'] },
       where: {

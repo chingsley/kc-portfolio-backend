@@ -1,18 +1,21 @@
 import supertest from 'supertest';
 import bcrypt from 'bcryptjs';
 
-import db from '../../../src/database/models';
+import db from '../../src/database/models';
 
-import server from '../../../src/server';
+import server from '../../src/server';
 
-import { sampleUsers } from '../../data.samples/users.samples';
-import UserController from '../../../src/resources/user/user.controller';
+import { sampleUsers } from './userTest.samples';
+import UserController from '../../src/resources/user/user.controller';
+import UserTestHelper from './UserTest.helper';
 
 const app = supertest(server.server);
 
+const helper = new UserTestHelper();
+
 describe('UserController', () => {
   beforeAll(async () => {
-    await db.User.destroy({ where: {}, truncate: { cascade: true } });
+    await helper.resetDB([db.User]);
   });
 
   describe('registerUser', () => {
@@ -119,6 +122,25 @@ describe('UserController', () => {
         const next = jest.fn();
         UserController.registerUser(req, res, next);
         expect(next).toHaveBeenCalled();
+      });
+    });
+  });
+  describe('getAllUsers', () => {
+    beforeAll(async () => {
+      await helper.resetDB();
+      await helper.createBulkUsers();
+    });
+    describe('try', () => {
+      it('returns 200 OK on successful fetch', async (done) => {
+        try {
+          const res = await app.get('/api/v1/users');
+          expect(res.status).toBe(200);
+          expect(res.body.data.count).toEqual(sampleUsers.length);
+          expect(res.body.data.rows).toHaveLength(sampleUsers.length);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });

@@ -18,7 +18,7 @@ export default class UserController extends AppController {
     try {
       const userService = new UserService(req, res);
       const data = await userService.fetchAllUsers();
-      return res.status(201).json({
+      return res.status(200).json({
         message: 'successful',
         data,
       });

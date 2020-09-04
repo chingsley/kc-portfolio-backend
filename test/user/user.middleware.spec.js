@@ -1,9 +1,8 @@
 import supertest from 'supertest';
 import Joi from '@hapi/joi';
 
-import server from '../../../src/server';
-
-import { sampleUsers } from '../../data.samples/users.samples';
+import server from '../../src/server';
+import { sampleUsers } from './userTest.samples';
 
 const app = supertest(server.server);
 
