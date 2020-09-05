@@ -1,6 +1,6 @@
 import db from '../../src/database/models';
 import { sampleUsers } from './userTest.samples';
-import AppTestHelper from '../app/AppTest.helper';
+import AppTestHelper from '../app/app.testHelper';
 
 class UserTestHelper extends AppTestHelper {
   async createBulkUsers() {
