@@ -23,8 +23,8 @@
     "test:watchAll": "cross-env NODE_ENV=test jest --detectOpenHandles --watchAll",
     "test": "npm run db:reset:test && cross-env NODE_ENV=test jest --detectOpenHandles --watch",
     "coverage": "npm run db:reset:test && cross-env DB_ENV=test jest --detectOpenHandles --verbose --coverage --forceExit",
-    "test:userMiddleware": "jest test/resources/user/user.middleware.spec.js --detectOpenHandles --verbose --watch",
-    "test:userController": "jest test/resources/user/user.controller.spec.js --detectOpenHandles --verbose --watch"
+    "test:userMiddleware": "jest test/user/user.middleware.spec.js --detectOpenHandles --verbose --watch",
+    "test:userController": "jest test/user/user.controller.spec.js --detectOpenHandles --verbose --watch"
   },
   "dependencies": {
     "@babel/cli": "^7.8.4",

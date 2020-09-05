@@ -7,7 +7,7 @@ import server from '../../src/server';
 
 import { sampleUsers } from './userTest.samples';
 import UserController from '../../src/resources/user/user.controller';
-import UserTestHelper from './UserTest.helper';
+import UserTestHelper from './user.testHelper';
 
 const app = supertest(server.server);
 
@@ -126,17 +126,107 @@ describe('UserController', () => {
     });
   });
   describe('getAllUsers', () => {
+    let res;
     beforeAll(async () => {
       await helper.resetDB();
       await helper.createBulkUsers();
+      res = await app.get('/api/v1/users');
     });
     describe('try', () => {
       it('returns 200 OK on successful fetch', async (done) => {
         try {
-          const res = await app.get('/api/v1/users');
           expect(res.status).toBe(200);
           expect(res.body.data.count).toEqual(sampleUsers.length);
           expect(res.body.data.rows).toHaveLength(sampleUsers.length);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      it('returns array of all inserted element with a count property', async (done) => {
+        try {
+          expect(res.body.data.count).toEqual(sampleUsers.length);
+          expect(res.body.data.rows).toHaveLength(sampleUsers.length);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      it('can paginates the result', async (done) => {
+        try {
+          const pageSize = 1;
+          const res = await app.get(
+            `/api/v1/users?pageSize=${pageSize}&page=0`
+          );
+          expect(res.body.data.count).toEqual(sampleUsers.length);
+          expect(res.body.data.rows).toHaveLength(pageSize);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      it('can filter the result by firstName', async (done) => {
+        try {
+          const firstNameLike = 'king';
+          const res = await app.get(`/api/v1/users?firstName=${firstNameLike}`);
+          for (let user of res.body.data.rows) {
+            expect(user.firstName).toMatch(firstNameLike);
+          }
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      it('can filter the result by lastName', async (done) => {
+        try {
+          const lastNameLike = 'sn';
+          const res = await app.get(`/api/v1/users?lastName=${lastNameLike}`);
+          for (let user of res.body.data.rows) {
+            expect(user.lastName).toMatch(lastNameLike);
+          }
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      it('can filter the result by username', async (done) => {
+        try {
+          const usernameLike = 'ene';
+          const res = await app.get(`/api/v1/users?username=${usernameLike}`);
+          for (let user of res.body.data.rows) {
+            expect(user.username).toMatch(usernameLike);
+          }
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      it('can filter the result by email', async (done) => {
+        try {
+          const emailLike = 'arya';
+          const res = await app.get(`/api/v1/users?email=${emailLike}`);
+          for (let user of res.body.data.rows) {
+            expect(user.email).toMatch(emailLike);
+          }
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+    describe('catch', () => {
+      it('catches error in the catch block', async (done) => {
+        try {
+          const req = { query: {} };
+          const res = { body: {} };
+          const next = jest.fn();
+          const originalImplementation = db.User.findAndCountAll;
+          db.User.findAndCountAll = jest.fn().mockImplementation(() => {
+            throw new Error('bummer');
+          });
+          UserController.getAllUsers(req, res, next);
+          db.User.findAndCountAll = originalImplementation;
+          expect(next).toHaveBeenCalled();
           done();
         } catch (e) {
           done(e);
