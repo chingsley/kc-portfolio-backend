@@ -5,7 +5,7 @@ import db from '../../src/database/models';
 
 import server from '../../src/server';
 
-import { sampleUsers } from './userTest.samples';
+import { sampleUsers } from './user.testSamples';
 import UserController from '../../src/resources/user/user.controller';
 import UserTestHelper from './user.testHelper';
 
