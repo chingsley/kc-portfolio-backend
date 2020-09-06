@@ -2,7 +2,7 @@ import supertest from 'supertest';
 import Joi from '@hapi/joi';
 
 import server from '../../src/server';
-import { sampleUsers } from './userTest.samples';
+import { sampleUsers } from './user.testSamples';
 
 const app = supertest(server.server);
 
