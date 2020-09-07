@@ -58,8 +58,10 @@ describe('UserController', () => {
       it('returns the user data in response body', async (done) => {
         try {
           const { firstName, lastName, email, username } = sampleUser;
-          const { data } = res.body;
-          expect(data).toEqual(
+          const {
+            data: { user },
+          } = res.body;
+          expect(user).toEqual(
             expect.objectContaining({
               firstName,
               lastName,
@@ -116,12 +118,20 @@ describe('UserController', () => {
       });
     });
     describe('catch', () => {
-      it('catches errors in the catch block', () => {
-        const req = undefined;
-        const res = { body: {} };
-        const next = jest.fn();
-        UserController.registerUser(req, res, next);
-        expect(next).toHaveBeenCalled();
+      it('catches errors in the catch block', async (done) => {
+        try {
+          const originalImplementation = db.create;
+          db.User.create = jest.fn().mockImplementation(() => {
+            throw new Error('bummer');
+          });
+          const res = await app.post('/api/v1/users').send(sampleUsers[0]);
+          db.User.create = originalImplementation;
+          expect(res.status).toBe(500);
+          expect(res.body).toHaveProperty('error', 'bummer');
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });
