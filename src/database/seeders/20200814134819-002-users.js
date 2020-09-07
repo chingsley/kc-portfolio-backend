@@ -3,6 +3,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+const uuidv4 = require('uuid/v4');
+
 const bcrypt = require('bcryptjs');
 const password = bcrypt.hashSync('testng', Number(process.env.BCRYPT_SALT));
 
@@ -19,6 +21,7 @@ module.exports = {
         roleId: 1,
         image:
           'https://res.cloudinary.com/dmx0a3nqi/image/upload/t_media_lib_thumb/v1571040003/gbart8vc5ervfmccdqlm.png',
+        uuid: uuidv4(),
       },
       {
         firstName: 'kelvin',
@@ -27,6 +30,7 @@ module.exports = {
         username: 'kesegbona',
         password,
         roleId: 2,
+        uuid: uuidv4(),
       },
     ]);
   },

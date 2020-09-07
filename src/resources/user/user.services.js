@@ -7,14 +7,15 @@ export default class UserService extends AppService {
     super(req, res);
   }
 
-  async createUser(newUser) {
+  async createUser(t) {
+    const newUser = this.req.body;
     await this.rejectDuplicateEmail(newUser.email);
     await this.rejectDuplicateUsername(newUser.username);
     newUser.roleId = await this.getRoleId('user');
     newUser.image = this.req.files
       ? await Cloudinary.uploadImage(this.req.files)
       : newUser.image;
-    return db.User.create(newUser);
+    return db.User.create(newUser, { transaction: t });
   }
 
   fetchAllUsers() {
