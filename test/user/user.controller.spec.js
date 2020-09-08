@@ -1,13 +1,16 @@
 import supertest from 'supertest';
 import bcrypt from 'bcryptjs';
 
+import { v2 as cloudinary } from 'cloudinary';
+
 import db from '../../src/database/models';
 
 import server from '../../src/server';
 
-import { sampleUsers } from './user.testSamples';
+import { sampleUsers, sampleUserImage } from './user.testSamples';
 import UserController from '../../src/resources/user/user.controller';
 import UserTestHelper from './user.testHelper';
+import RoleService from '../../src/resources/role/role.services';
 
 const app = supertest(server.server);
 
@@ -23,10 +26,25 @@ describe('UserController', () => {
       user,
       sampleUser = sampleUsers[1];
     beforeAll(async () => {
-      res = await app.post('/api/v1/users').send(sampleUser);
-      const { email } = sampleUser;
+      const originalImplementation = cloudinary.uploader.upload;
+      cloudinary.uploader.upload = jest
+        .fn()
+        .mockReturnValue({ url: sampleUserImage });
+      await helper.resetDB([db.User]);
+      const { firstName, lastName, username, email, password } = sampleUser;
+      const imageFile = `${process.cwd()}/test/testData/img.sample.jpg`;
+      res = await app
+        .post('/api/v1/users')
+        .field('firstName', firstName)
+        .field('lastName', lastName)
+        .field('username', username)
+        .field('email', email)
+        .field('password', password)
+        .attach('image', imageFile);
+      cloudinary.uploader.upload = originalImplementation;
+      // const { email } = sampleUser;
       user = await db.User.findOne({
-        where: { email },
+        where: { email: sampleUser.email },
       });
     });
     describe('try', () => {
@@ -50,6 +68,14 @@ describe('UserController', () => {
       it('returns status code 201 with a success message', async (done) => {
         try {
           expect(res.status).toBe(201);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      it('can upload image to cloudinary', async (done) => {
+        try {
+          expect(res.body.data.user.image).toBe(sampleUserImage);
           done();
         } catch (e) {
           done(e);

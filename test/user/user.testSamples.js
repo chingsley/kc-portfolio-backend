@@ -21,3 +21,6 @@ export const sampleUsers = [
     lastName: 'snow',
   },
 ];
+
+export const sampleUserImage =
+  'https://res.cloudinary.com/dmx0a3nqi/image/upload/t_media_lib_thumb/v1571040003/gbart8vc5ervfmccdqlm.png';

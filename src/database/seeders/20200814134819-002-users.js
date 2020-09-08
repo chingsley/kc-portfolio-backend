@@ -1,9 +1,9 @@
 'use strict';
 
+import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
-dotenv.config();
 
-const uuidv4 = require('uuid/v4');
+dotenv.config();
 
 const bcrypt = require('bcryptjs');
 const password = bcrypt.hashSync('testng', Number(process.env.BCRYPT_SALT));
