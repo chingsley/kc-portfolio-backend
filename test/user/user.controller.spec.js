@@ -10,7 +10,6 @@ import server from '../../src/server';
 import { sampleUsers, sampleUserImage } from './user.testSamples';
 import UserController from '../../src/resources/user/user.controller';
 import UserTestHelper from './user.testHelper';
-import RoleService from '../../src/resources/role/role.services';
 
 const app = supertest(server.server);
 
@@ -42,7 +41,6 @@ describe('UserController', () => {
         .field('password', password)
         .attach('image', imageFile);
       cloudinary.uploader.upload = originalImplementation;
-      // const { email } = sampleUser;
       user = await db.User.findOne({
         where: { email: sampleUser.email },
       });
