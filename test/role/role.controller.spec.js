@@ -149,7 +149,7 @@ describe('RoleController', () => {
           db.Role.findOne = jest.fn().mockImplementation(() => {
             throw new Error('bummer!');
           });
-          const res = await app.post('/api/v1/roles').send({ name: 'admin' });
+          const res = await app.delete(`/api/v1/roles/${role.id}`);
           db.Role.findOne = origingalImplementation;
           expect(res.status).toBe(500);
           expect(res.body).toHaveProperty('error', 'bummer!');
