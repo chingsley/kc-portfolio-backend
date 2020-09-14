@@ -21,10 +21,10 @@ export default class RoleMiddleware {
 
   static async validateRoleId(req, res, next) {
     try {
-      const newUserSchema = Joi.object({
+      const roleIdSchema = Joi.object({
         id: Joi.number().integer().min(1),
       });
-      const error = await validateSchema(newUserSchema, req);
+      const error = await validateSchema(roleIdSchema, req);
       if (error) return res.status(400).json({ error });
       return next();
     } catch (error) {

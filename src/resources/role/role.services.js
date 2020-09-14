@@ -1,24 +1,24 @@
 import db from '../../database/models';
+import AppService from '../app/app.service';
 
-export default class RoleService {
+export default class RoleService extends AppService {
   constructor(req, res) {
-    this.req = req;
-    this.res = res;
+    super(req, res);
   }
 
-  async create(newRole) {
+  create = async (newRole) => {
     await this.rejectDuplicateRole(newRole.name);
     return db.Role.create(newRole);
-  }
+  };
 
-  async update(id, changes) {
+  update = async (id, changes) => {
     await this.rejectDuplicateRole(changes.name);
     const role = await this.findOne(id);
     await role.update(changes);
     return role;
-  }
+  };
 
-  async findOne(id) {
+  findOne = async (id) => {
     const role = await this.findBy('id', id);
     if (!role) {
       throw new Error(
@@ -29,22 +29,22 @@ export default class RoleService {
       );
     }
     return role;
-  }
+  };
 
-  async remove(id) {
+  remove = async (id) => {
     const role = await this.findOne(id);
     await role.destroy();
     return true;
-  }
+  };
 
-  findBy(field, value) {
+  findBy = (field, value) => {
     return db.Role.findOne({
       where: { [field]: value },
       include: [{ model: db.User, as: 'users' }],
     });
-  }
+  };
 
-  async rejectDuplicateRole(roleName) {
+  rejectDuplicateRole = async (roleName) => {
     const role = await this.findBy('name', roleName);
     if (role && `${this.req.params.id}` !== `${role.id}`) {
       throw new Error(
@@ -54,5 +54,5 @@ export default class RoleService {
         })
       );
     }
-  }
+  };
 }
