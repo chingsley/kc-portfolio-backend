@@ -1,13 +1,15 @@
+import bcrypt from 'bcryptjs';
 import db from '../../database/models';
 import Cloudinary from '../../utils/Cloudinary';
 import AppService from '../app/app.service';
+import Jwt from '../../utils/Jwt';
 
 export default class UserService extends AppService {
   constructor(req, res) {
     super(req, res);
   }
 
-  async createUser(t) {
+  createUser = async (t) => {
     const newUser = this.req.body;
     await this.rejectDuplicateEmail(newUser.email);
     await this.rejectDuplicateUsername(newUser.username);
@@ -16,9 +18,9 @@ export default class UserService extends AppService {
       ? await Cloudinary.uploadImage(this.req.files)
       : newUser.image;
     return db.User.create(newUser, { transaction: t });
-  }
+  };
 
-  fetchAllUsers() {
+  fetchAllUsers = () => {
     return db.User.findAndCountAll({
       attributes: { exclude: ['password'] },
       where: {
@@ -30,9 +32,34 @@ export default class UserService extends AppService {
         { model: db.Project, as: 'projects' },
       ],
     });
-  }
+  };
 
-  async rejectDuplicateEmail(email) {
+  handleLogin = async () => {
+    const { email, username, password } = this.req.body;
+    let user = email
+      ? await this.findBy('email', email)
+      : await this.findBy('username', username);
+    if (!user) {
+      return this.response({
+        status: 401,
+        err: 'Login failed. Invalid credentials.',
+        errorCode: '001',
+      });
+    }
+    const isCorrectPassword = bcrypt.compareSync(password, user.password);
+    if (isCorrectPassword) {
+      const token = Jwt.generateToken(user);
+      return { user: { ...user.dataValues, password: undefined }, token };
+    } else {
+      return this.response({
+        status: 401,
+        err: 'Login failed. Invalid credentials.',
+        errorCode: '002',
+      });
+    }
+  };
+
+  rejectDuplicateEmail = async (email) => {
     const user = await this.findBy('email', email);
     if (user && `${this.req.params.id}` !== `${user.id}`) {
       throw new Error(
@@ -42,9 +69,9 @@ export default class UserService extends AppService {
         })
       );
     }
-  }
+  };
 
-  async rejectDuplicateUsername(username) {
+  rejectDuplicateUsername = async (username) => {
     const user = await this.findBy('username', username);
     if (user && `${this.req.params.id}` !== `${user.id}`) {
       throw new Error(
@@ -54,16 +81,16 @@ export default class UserService extends AppService {
         })
       );
     }
-  }
+  };
 
-  findBy(field, value) {
+  findBy = (field, value) => {
     return db.User.findOne({
       where: { [field]: value },
-      include: [{ model: db.Project, as: 'projects' }],
+      // include: [{ model: db.Project, as: 'projects' }],
     });
-  }
+  };
 
-  async getRoleId(roleName) {
+  getRoleId = async (roleName) => {
     const [role] = await db.Role.findOrCreate({
       where: { name: roleName },
     });
@@ -73,5 +100,9 @@ export default class UserService extends AppService {
     }
 
     return role.id;
-  }
+  };
+
+  response = (responseObj) => {
+    throw new Error(JSON.stringify(responseObj));
+  };
 }

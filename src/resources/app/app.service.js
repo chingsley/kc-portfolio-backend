@@ -1,10 +1,9 @@
 import { Op } from 'sequelize';
 
 export default class AppService {
-  constructor(req, res, next) {
+  constructor(req, res) {
     this.req = req;
     this.res = res;
-    this.next = next;
   }
 
   filterBy(arrOfFields) {

@@ -11,6 +11,11 @@ router.post(
   UserMiddleware.validateImageUpload,
   UserController.registerUser
 );
+router.post(
+  '/login',
+  UserMiddleware.validateLoginDetails,
+  UserController.loginUser
+);
 
 router.get('/', UserController.getAllUsers);
 
