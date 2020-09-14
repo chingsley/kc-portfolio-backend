@@ -40,7 +40,7 @@ export default class UserService extends AppService {
       ? await this.findBy('email', email)
       : await this.findBy('username', username);
     if (!user) {
-      return this.response({
+      this.throwError({
         status: 401,
         err: 'Login failed. Invalid credentials.',
         errorCode: '001',
@@ -48,10 +48,12 @@ export default class UserService extends AppService {
     }
     const isCorrectPassword = bcrypt.compareSync(password, user.password);
     if (isCorrectPassword) {
-      const token = Jwt.generateToken(user);
-      return { user: { ...user.dataValues, password: undefined }, token };
+      return {
+        user: { ...user.dataValues, password: undefined },
+        token: Jwt.generateToken(user),
+      };
     } else {
-      return this.response({
+      this.throwError({
         status: 401,
         err: 'Login failed. Invalid credentials.',
         errorCode: '002',
@@ -62,24 +64,20 @@ export default class UserService extends AppService {
   rejectDuplicateEmail = async (email) => {
     const user = await this.findBy('email', email);
     if (user && `${this.req.params.id}` !== `${user.id}`) {
-      throw new Error(
-        JSON.stringify({
-          status: 409,
-          err: `email ${email} already exists. Duplicate email is not allowed`,
-        })
-      );
+      this.throwError({
+        status: 409,
+        err: `email ${email} already exists. Duplicate email is not allowed`,
+      });
     }
   };
 
   rejectDuplicateUsername = async (username) => {
     const user = await this.findBy('username', username);
     if (user && `${this.req.params.id}` !== `${user.id}`) {
-      throw new Error(
-        JSON.stringify({
-          status: 409,
-          err: `username ${username} already exists. Duplicate username is not allowed`,
-        })
-      );
+      this.throwError({
+        status: 409,
+        err: `username ${username} already exists. Duplicate username is not allowed`,
+      });
     }
   };
 
@@ -102,7 +100,7 @@ export default class UserService extends AppService {
     return role.id;
   };
 
-  response = (responseObj) => {
+  throwError = (responseObj) => {
     throw new Error(JSON.stringify(responseObj));
   };
 }

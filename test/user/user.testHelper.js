@@ -10,6 +10,11 @@ class UserTestHelper extends AppTestHelper {
     );
   }
 
+  async createUser({ user, role }) {
+    const userRole = await this.createRole(role);
+    return db.User.create({ ...user, roleId: userRole.id });
+  }
+
   async createRole(roleType) {
     const [role] = await db.Role.findOrCreate({ where: { name: roleType } });
     return role;
