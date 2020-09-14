@@ -13,13 +13,9 @@ import UserTestHelper from './user.testHelper';
 
 const app = supertest(server.server);
 
-const helper = new UserTestHelper();
+const userHelper = new UserTestHelper();
 
 describe('UserController', () => {
-  beforeAll(async () => {
-    await helper.resetDB([db.User]);
-  });
-
   describe('registerUser', () => {
     let res,
       user,
@@ -29,7 +25,7 @@ describe('UserController', () => {
       cloudinary.uploader.upload = jest
         .fn()
         .mockReturnValue({ url: sampleUserImage });
-      await helper.resetDB([db.User]);
+      await userHelper.resetDB([db.User]);
       const { firstName, lastName, username, email, password } = sampleUser;
       const imageFile = `${process.cwd()}/test/testData/img.sample.jpg`;
       res = await app
@@ -144,7 +140,7 @@ describe('UserController', () => {
     describe('catch', () => {
       it('catches errors in the catch block', async (done) => {
         try {
-          const originalImplementation = db.create;
+          const originalImplementation = db.User.create;
           db.User.create = jest.fn().mockImplementation(() => {
             throw new Error('bummer');
           });
@@ -159,11 +155,12 @@ describe('UserController', () => {
       });
     });
   });
+
   describe('getAllUsers', () => {
     let res;
     beforeAll(async () => {
-      await helper.resetDB();
-      await helper.createBulkUsers();
+      await userHelper.resetDB();
+      await userHelper.createBulkUsers();
       res = await app.get('/api/v1/users');
     });
     describe('try', () => {
@@ -266,6 +263,90 @@ describe('UserController', () => {
           done(e);
         }
       });
+    });
+  });
+
+  describe('loginUser', () => {
+    let user;
+    beforeAll(async () => {
+      await userHelper.resetDB();
+      user = await userHelper.createUser({
+        user: sampleUsers[0],
+        role: 'user',
+      });
+    });
+
+    it('logs in a user with valid email and password', async (done) => {
+      try {
+        const res = await app.post('/api/v1/users/login').send({
+          email: user.email,
+          password: sampleUsers[0].password,
+        });
+        const { data } = res.body;
+        expect(res.status).toBe(200);
+        expect(data.user).toEqual(
+          expect.objectContaining({
+            id: user.id,
+            uuid: user.uuid,
+            email: user.email,
+            username: user.username,
+          })
+        );
+        expect(data).toHaveProperty('token');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('logs in a user with valid username and password', async (done) => {
+      try {
+        const res = await app.post('/api/v1/users/login').send({
+          username: user.username,
+          password: sampleUsers[0].password,
+        });
+        const { data } = res.body;
+        expect(res.status).toBe(200);
+        expect(data.user).toEqual(
+          expect.objectContaining({
+            id: user.id,
+            uuid: user.uuid,
+            email: user.email,
+            username: user.username,
+          })
+        );
+        expect(data).toHaveProperty('token');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('returns status 401 if email/username not found', async (done) => {
+      try {
+        const res = await app.post('/api/v1/users/login').send({
+          username: user.username + 'invalid',
+          password: sampleUsers[0].password,
+        });
+        const expectedError = 'Login failed. Invalid credentials.';
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('error', expectedError);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('returns status 401 if password is incorrect', async (done) => {
+      try {
+        const res = await app.post('/api/v1/users/login').send({
+          username: user.username,
+          password: sampleUsers[0].password + 'invalid',
+        });
+        const expectedError = 'Login failed. Invalid credentials.';
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('error', expectedError);
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
   });
 });
