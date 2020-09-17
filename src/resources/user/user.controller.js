@@ -47,4 +47,16 @@ export default class UserController extends AppController {
       UserController.handleError(error, req, res, next);
     }
   }
+
+  static async requestPasswordReset(req, res, next) {
+    try {
+      const userService = new UserService(req, res);
+      const user = await userService.initializePasswordReset();
+      return res.status(200).json({
+        message: `Please check your inbox ${user.email} for password reset instructions.`,
+      });
+    } catch (error) {
+      UserController.handleError(error, req, res, next);
+    }
+  }
 }

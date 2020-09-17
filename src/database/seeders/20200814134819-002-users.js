@@ -6,7 +6,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const bcrypt = require('bcryptjs');
-const password = bcrypt.hashSync('testing', Number(process.env.BCRYPT_SALT));
+const password = bcrypt.hashSync(
+  'Testing*123',
+  Number(process.env.BCRYPT_SALT)
+);
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars

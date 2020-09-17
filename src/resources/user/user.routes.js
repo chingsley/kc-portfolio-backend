@@ -17,6 +17,12 @@ router.post(
   UserController.loginUser
 );
 
+router.post(
+  '/requestpasswordreset',
+  UserMiddleware.validateEmail,
+  UserController.requestPasswordReset
+);
+
 router.get('/', UserController.getAllUsers);
 
 export default router;
