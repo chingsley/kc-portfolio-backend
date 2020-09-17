@@ -40,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     Project.belongsTo(models.User, {
       foreignKey: 'userId',
       as: 'user',
+      onDelete: 'CASCADE',
     });
   };
   return Project;

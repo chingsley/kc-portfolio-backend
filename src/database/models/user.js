@@ -63,10 +63,16 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.Project, {
       foreignKey: 'userId',
       as: 'projects',
+      onDelete: 'CASCADE',
     });
     User.belongsTo(models.Role, {
       foreignKey: 'roleId',
       as: 'role',
+    });
+    User.hasOne(models.PasswordReset, {
+      foreignKey: 'userId',
+      as: 'passwordReset',
+      onDelete: 'CASCADE',
     });
   };
 

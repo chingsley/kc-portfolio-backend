@@ -42,4 +42,17 @@ export default class UserMiddleware extends AppMiddleware {
       return next(error.message);
     }
   }
+
+  static async validateEmail(req, res, next) {
+    try {
+      const emailSchema = Joi.object({
+        email: Joi.string().email().trim().required(),
+      });
+      const error = await validateSchema(emailSchema, req);
+      if (error) return res.status(400).json({ error });
+      return next();
+    } catch (error) {
+      return next(error.message);
+    }
+  }
 }
