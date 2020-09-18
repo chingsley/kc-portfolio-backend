@@ -18,7 +18,7 @@ router.post(
 );
 
 router.post(
-  '/requestpasswordreset',
+  '/request_password_reset',
   UserMiddleware.validateEmail,
   UserController.requestPasswordReset
 );
