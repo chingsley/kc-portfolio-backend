@@ -65,6 +65,7 @@ export default class UserService extends AppService {
   };
 
   initializePasswordReset = async () => {
+    console.log(this.req.body);
     const { email } = this.req.body;
 
     let passwordReset = null;
