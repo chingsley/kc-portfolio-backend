@@ -29,7 +29,7 @@ class Cloudinary {
 
       return imageUrl;
     } catch (error) {
-      throw new Error(`image upload error: ${error.message}`);
+      throw new Error(`image upload error: ${error.message || error.error}`);
     }
   }
 }
