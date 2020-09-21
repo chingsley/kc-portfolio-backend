@@ -11,6 +11,7 @@ router.post(
   UserMiddleware.validateImageUpload,
   UserController.registerUser
 );
+
 router.post(
   '/login',
   UserMiddleware.validateLoginDetails,
