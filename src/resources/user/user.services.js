@@ -125,8 +125,4 @@ export default class UserService extends AppService {
 
     return role.id;
   };
-
-  throwError = (responseObj) => {
-    throw new Error(JSON.stringify(responseObj));
-  };
 }

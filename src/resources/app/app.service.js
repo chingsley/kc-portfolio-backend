@@ -27,4 +27,8 @@ export default class AppService {
       };
     }
   }
+
+  throwError = (responseObj) => {
+    throw new Error(JSON.stringify(responseObj));
+  };
 }
