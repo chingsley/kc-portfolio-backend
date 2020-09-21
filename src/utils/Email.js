@@ -40,7 +40,7 @@ export default class Email {
     <body>
       <div style="background-color: #130f40;">
           <p>click the link below to reset your password</p>
-          <a href="${process.env.HOST_URL_FRONTEND}/resetpassword/${resetToken}">${process.env.HOST_URL_FRONTEND}/resetpassword/${resetToken}</a>
+          <a href="${process.env.HOST_URL_FRONTEND}/password/reset/${resetToken}">${process.env.HOST_URL_FRONTEND}/password/reset/${resetToken}</a>
         <div />
     </body>
   </html>
