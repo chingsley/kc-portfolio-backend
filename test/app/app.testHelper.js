@@ -1,4 +1,9 @@
+import moment from 'moment';
 import db from '../../src/database/models';
+
+export const tomorrow = moment().add(1, 'days').format('YYYY-MM-DD');
+export const today = moment().format('YYYY-MM-DD');
+export const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
 
 class AppTestHelper {
   async resetDB(modelsArr) {

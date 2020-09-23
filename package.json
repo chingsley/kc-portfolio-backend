@@ -27,7 +27,8 @@
     "test:userController": "jest test/user/user.controller.spec.js --detectOpenHandles --verbose --watch",
     "test:appMiddleware": "jest test/app/app.middleware.spec.js --detectOpenHandles --verbose --watch",
     "test:roleController": "jest test/role/role.controller.spec.js --detectOpenHandles --verbose --watch",
-    "test:roleMiddleware": "jest test/role/role.middleware.spec.js --detectOpenHandles --verbose --watch"
+    "test:roleMiddleware": "jest test/role/role.middleware.spec.js --detectOpenHandles --verbose --watch",
+    "test:authController": "jest test/auth/auth.controller.spec.js --detectOpenHandles --verbose --watch"
   },
   "dependencies": {
     "@babel/cli": "^7.8.4",
