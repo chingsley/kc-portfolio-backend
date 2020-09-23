@@ -7,7 +7,7 @@ const router = express.Router();
 router.get(
   '/password/validate_reset_token',
   AuthMiddleware.validateUUID,
-  AuthController.validatePasswordResetKey
+  AuthController.validatePasswordResetToken
 );
 
 export default router;

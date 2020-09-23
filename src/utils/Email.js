@@ -15,11 +15,13 @@ export default class Email {
       const msg = {
         to: email,
         from: process.env.SENDER_ADDRESS,
-        subject: 'NNS Management System',
+        subject: 'Showtowa',
         text: message || html,
         html: html || '',
       };
-      await sgMail.send(msg);
+      const result = await sgMail.send(msg);
+      const { log } = console;
+      process.env.NODE_ENV === 'development' && log(result);
     } catch (error) {
       return error;
     }

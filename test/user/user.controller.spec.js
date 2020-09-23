@@ -366,7 +366,6 @@ describe('UserController', () => {
         done(e);
       }
     });
-
     it('returns a message asking the user to check their mail for reset instructions', async (done) => {
       try {
         const message = `Please check your inbox ${email} for password reset instructions.`;

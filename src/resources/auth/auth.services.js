@@ -6,7 +6,7 @@ export default class AuthService extends AppService {
     super(req, res);
   }
 
-  getUserByPasswordResetKey = async () => {
+  getUserByPasswordResetToken = async () => {
     const { token: resetToken } = this.req.headers;
     const token = await db.PasswordReset.findOne({
       where: { resetToken },

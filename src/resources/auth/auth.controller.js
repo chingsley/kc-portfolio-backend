@@ -2,12 +2,12 @@ import AppController from '../app/app.controller';
 import AuthService from './auth.services';
 
 export default class AuthController extends AppController {
-  static async validatePasswordResetKey(req, res, next) {
+  static async validatePasswordResetToken(req, res, next) {
     try {
       const authService = new AuthService(req, res);
-      const user = await authService.getUserByPasswordResetKey();
+      const user = await authService.getUserByPasswordResetToken();
       return res.status(200).json({
-        message: 'successfully validated user password reset key',
+        message: 'successfully validated reset token',
         isValidPasswordResetToken: true,
         user,
       });
