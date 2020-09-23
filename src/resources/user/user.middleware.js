@@ -55,17 +55,4 @@ export default class UserMiddleware extends AppMiddleware {
       return next(error.message);
     }
   }
-
-  static async validateUUID(req, res, next) {
-    try {
-      const uuidSchema = Joi.string().guid({
-        version: ['uuidv4', 'uuidv5'],
-      });
-      const error = await validateSchema(uuidSchema, req);
-      if (error) return res.status(400).json({ error });
-      return next();
-    } catch (error) {
-      return next(error.message);
-    }
-  }
 }
