@@ -12,18 +12,6 @@ router.post(
   UserController.registerUser
 );
 
-router.post(
-  '/login',
-  UserMiddleware.validateLoginDetails,
-  UserController.loginUser
-);
-
-router.post(
-  '/request_password_reset',
-  UserMiddleware.validateEmail,
-  UserController.requestPasswordReset
-);
-
 router.get('/', UserController.getAllUsers);
 
 export default router;

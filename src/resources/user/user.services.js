@@ -1,11 +1,6 @@
-import bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
 import db from '../../database/models';
 import Cloudinary from '../../utils/Cloudinary';
 import AppService from '../app/app.service';
-import Jwt from '../../utils/Jwt';
-import helper from '../../utils/helpers';
-import Email from '../../utils/Email';
 
 export default class UserService extends AppService {
   constructor(req, res) {
@@ -35,56 +30,6 @@ export default class UserService extends AppService {
         { model: db.Project, as: 'projects' },
       ],
     });
-  };
-
-  handleLogin = async () => {
-    const { email, username, password } = this.req.body;
-    let user = email
-      ? await this.findBy('email', email)
-      : await this.findBy('username', username);
-    if (!user) {
-      this.throwError({
-        status: 401,
-        err: 'Login failed. Invalid credentials.',
-        errorCode: '001',
-      });
-    }
-    const isCorrectPassword = bcrypt.compareSync(password, user.password);
-    if (isCorrectPassword) {
-      return {
-        user: { ...user.dataValues, password: undefined },
-        token: Jwt.generateToken(user),
-      };
-    } else {
-      this.throwError({
-        status: 401,
-        err: 'Login failed. Invalid credentials.',
-        errorCode: '002',
-      });
-    }
-  };
-
-  initiatePasswordReset = async () => {
-    const { email } = this.req.body;
-
-    let passwordReset = null;
-    const user = await this.findBy('email', email);
-    if (user) {
-      passwordReset = await db.PasswordReset.upsert(
-        {
-          userId: user.id,
-          resetToken: uuidv4(),
-          expires: helper.setMinutes(30),
-        },
-        { returning: true }
-      );
-      const message = Email.getPasswordResetTemplate(
-        passwordReset[0].resetToken
-      );
-      await Email.send({ email: user.email, message, html: message });
-    }
-
-    return user;
   };
 
   rejectDuplicateEmail = async (email) => {
