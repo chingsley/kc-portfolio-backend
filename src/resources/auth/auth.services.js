@@ -1,3 +1,4 @@
+import Joi from '@hapi/joi';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import db from '../../database/models';
@@ -67,8 +68,24 @@ export default class AuthService extends UserService {
     return user;
   };
 
-  getUserByPasswordResetToken = async () => {
+  handleResetTokenValidation = async () => {
     const { token: resetToken } = this.req.headers;
+
+    const schema = Joi.object({
+      resetToken: Joi.string().guid({
+        version: ['uuidv4', 'uuidv5'],
+      }),
+    });
+
+    const { error } = schema.validate({ resetToken });
+    if (error)
+      // token is an invalid uuid value
+      this.throwError({
+        status: 400,
+        err: 'invalid token',
+        errorCode: 'PRT001',
+      });
+
     const token = await db.PasswordReset.findOne({
       where: { resetToken },
       include: {
@@ -78,9 +95,8 @@ export default class AuthService extends UserService {
       },
     });
 
-    // console.log(token);
-
     if (!token) {
+      // token not found in the db
       this.throwError({
         status: 400,
         err: 'invalid token',
@@ -89,6 +105,7 @@ export default class AuthService extends UserService {
     }
 
     if (token && token.expires < Date.now()) {
+      // token has expired
       this.throwError({
         status: 400,
         err: 'invalid token',

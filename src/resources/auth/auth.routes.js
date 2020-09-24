@@ -11,18 +11,21 @@ router.post(
   AuthController.loginUser
 );
 
-// /password/initiate_reset
 router.post(
   '/request_password_reset',
   UserMiddleware.validateEmail,
   AuthController.requestPasswordReset
 );
 
-// /validate_password_reset_token
 router.get(
   '/validate_password_reset_token',
-  AuthMiddleware.validateUUID,
   AuthController.validatePasswordResetToken
 );
+
+// router.patch(
+//   '/password/:reset_token',
+//   AuthMiddleware.validatePasswordResetData,
+//   AuthController.changePassword
+// );
 
 export default router;
