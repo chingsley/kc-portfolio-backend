@@ -1,4 +1,3 @@
-const sgMail = require('@sendgrid/mail');
 import supertest from 'supertest';
 import bcrypt from 'bcryptjs';
 

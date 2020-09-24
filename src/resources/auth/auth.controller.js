@@ -37,4 +37,16 @@ export default class AuthController extends AppController {
       AuthController.handleError(error, req, res, next);
     }
   }
+
+  static async changePassword(req, res, next) {
+    try {
+      const authService = new AuthService(req, res);
+      await authService.handlePasswordUpdate();
+      return res
+        .status(200)
+        .json({ message: 'Your password was successfully updated' });
+    } catch (error) {
+      AuthController.handleError(error, req, res, next);
+    }
+  }
 }
