@@ -181,6 +181,21 @@ describe('authController', () => {
         done(e);
       }
     });
+
+    it('returns status 400 with errorCode PRT001 if the token is not a valid uuid', async (done) => {
+      try {
+        const res = await app
+          .get('/api/v1/auth/validate_password_reset_token')
+          .set('token', 'INVALID-UUID-VALUE');
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invalid token');
+        expect(res.body).toHaveProperty('errorCode', 'PRT001');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+
     it('returns status 400 with errorCode PRT002 if the reset token is not found', async (done) => {
       try {
         const res = await app
