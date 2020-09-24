@@ -22,10 +22,10 @@ router.get(
   AuthController.validatePasswordResetToken
 );
 
-// router.patch(
-//   '/password/:reset_token',
-//   AuthMiddleware.validatePasswordResetData,
-//   AuthController.changePassword
-// );
+router.patch(
+  '/password/:resetToken',
+  AuthMiddleware.validatePasswordResetDetails,
+  AuthController.changePassword
+);
 
 export default router;

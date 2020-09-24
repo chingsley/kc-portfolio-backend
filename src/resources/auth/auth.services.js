@@ -27,7 +27,7 @@ export default class AuthService extends UserService {
       this.throwError({
         status: 401,
         err: 'Login failed. Invalid credentials.',
-        errorCode: '001',
+        errorCode: 'LGN001',
       });
     }
     const isCorrectPassword = bcrypt.compareSync(password, user.password);
@@ -40,14 +40,13 @@ export default class AuthService extends UserService {
       this.throwError({
         status: 401,
         err: 'Login failed. Invalid credentials.',
-        errorCode: '002',
+        errorCode: 'LGN002',
       });
     }
   };
 
   initiatePasswordReset = async () => {
     const { email } = this.req.body;
-
     let passwordReset = null;
     const user = await this.findBy('email', email);
     if (user) {
@@ -70,13 +69,11 @@ export default class AuthService extends UserService {
 
   handleResetTokenValidation = async () => {
     const { token: resetToken } = this.req.headers;
-
     const schema = Joi.object({
       resetToken: Joi.string().guid({
         version: ['uuidv4', 'uuidv5'],
       }),
     });
-
     const { error } = schema.validate({ resetToken });
     if (error)
       // token is an invalid uuid value
@@ -85,7 +82,24 @@ export default class AuthService extends UserService {
         err: 'invalid token',
         errorCode: 'PRT001',
       });
+    const token = await this.getPasswordResetToken(resetToken);
+    return token.user;
+  };
 
+  handlePasswordUpdate = async () => {
+    const { resetToken } = this.req.params;
+    const { password } = this.req.body;
+    const token = await this.getPasswordResetToken(resetToken);
+    const hashedPass = bcrypt.hashSync(
+      password,
+      Number(process.env.BCRYPT_SALT)
+    );
+    await token.user.update({ password: hashedPass });
+    await token.destroy();
+    return null;
+  };
+
+  async getPasswordResetToken(resetToken) {
     const token = await db.PasswordReset.findOne({
       where: { resetToken },
       include: {
@@ -113,6 +127,6 @@ export default class AuthService extends UserService {
       });
     }
 
-    return token.user;
-  };
+    return token;
+  }
 }
