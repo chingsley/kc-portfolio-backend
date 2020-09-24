@@ -11,14 +11,16 @@ router.post(
   AuthController.loginUser
 );
 
+// /password/initiate_reset
 router.post(
   '/request_password_reset',
   UserMiddleware.validateEmail,
   AuthController.requestPasswordReset
 );
 
+// /validate_password_reset_token
 router.get(
-  '/password/validate_reset_token',
+  '/validate_password_reset_token',
   AuthMiddleware.validateUUID,
   AuthController.validatePasswordResetToken
 );
