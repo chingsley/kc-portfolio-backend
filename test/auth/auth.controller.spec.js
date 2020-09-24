@@ -173,7 +173,7 @@ describe('authController', () => {
     it('returns 200 upon successful validation', async (done) => {
       try {
         const res = await app
-          .get('/api/v1/auth/password/validate_reset_token')
+          .get('/api/v1/auth/validate_password_reset_token')
           .set('token', resetToken);
         expect(res.status).toBe(200);
         done();
@@ -184,7 +184,7 @@ describe('authController', () => {
     it('returns status 400 with errorCode PRT002 if the reset token is not found', async (done) => {
       try {
         const res = await app
-          .get('/api/v1/auth/password/validate_reset_token')
+          .get('/api/v1/auth/validate_password_reset_token')
           .set('token', `404${resetToken.slice(3)}`);
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'invalid token');
@@ -200,7 +200,7 @@ describe('authController', () => {
           expires: yesterday,
         });
         const res = await app
-          .get('/api/v1/auth/password/validate_reset_token')
+          .get('/api/v1/auth/validate_password_reset_token')
           .set('token', resetToken);
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'invalid token');

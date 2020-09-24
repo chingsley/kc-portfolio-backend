@@ -106,7 +106,7 @@ describe('authMiddleware', () => {
       it('returns status 400 with errorCode PRT001 if the token is not a valid uuid', async (done) => {
         try {
           const res = await app
-            .get('/api/v1/auth/password/validate_reset_token')
+            .get('/api/v1/auth/validate_password_reset_token')
             .set('token', 'INVALID-UUID-VALUE');
           expect(res.status).toBe(400);
           expect(res.body).toHaveProperty('error', 'invalid token');
@@ -126,7 +126,7 @@ describe('authMiddleware', () => {
             throw new Error(sampleError);
           });
           const res = await app
-            .get('/api/v1/auth/password/validate_reset_token')
+            .get('/api/v1/auth/validate_password_reset_token')
             .set('token', 'INVALID-UUID-VALUE');
           Joi.object = oiriginalImplementation;
           expect(res.status).toBe(500);
