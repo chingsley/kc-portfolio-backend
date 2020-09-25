@@ -17,6 +17,10 @@ class AppTestHelper {
         await modelsArr[i].destroy({ where: {}, truncate: { cascade: true } });
       }
     } else {
+      await db.PasswordReset.destroy({
+        where: {},
+        truncate: { cascade: true },
+      });
       await db.User.destroy({ where: {}, truncate: { cascade: true } });
       await db.Role.destroy({ where: {}, truncate: { cascade: true } });
     }

@@ -16,6 +16,13 @@ const userHelper = new UserTestHelper();
 const authHelper = new AuthTestHelper();
 
 describe('authController', () => {
+  let originalSendGridImplemenation = sgMail.send;
+  beforeAll(() => {
+    sgMail.send = jest.fn().mockImplementation(() => true);
+  });
+  afterAll(() => {
+    sgMail.send = originalSendGridImplemenation;
+  });
   describe('loginUser', () => {
     let user;
     beforeAll(async () => {
@@ -110,12 +117,9 @@ describe('authController', () => {
         user: sampleUsers[0],
         role: 'user',
       });
-      const originalImplementation = sgMail.send;
-      sgMail.send = jest.fn().mockImplementation(() => true);
       res = await app
         .post('/api/v1/auth/request_password_reset')
         .send({ email });
-      sgMail.send = originalImplementation;
     });
 
     it('returns 200 on successful response', async (done) => {
@@ -126,6 +130,7 @@ describe('authController', () => {
         done(e);
       }
     });
+
     it('returns a message asking the user to check their mail for reset instructions', async (done) => {
       try {
         const message = `Please check your inbox ${email} for password reset instructions.`;
@@ -148,6 +153,20 @@ describe('authController', () => {
         db.User.findOne = originalImplementation;
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty('error', error);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('does not send mail if no user matches the supplied email', async (done) => {
+      try {
+        const originalImplementation = sgMail.send;
+        sgMail.send = jest.fn();
+        await app
+          .post('/api/v1/auth/request_password_reset')
+          .send({ email: 'nouser@gmail.com' });
+        expect(sgMail.send).not.toHaveBeenCalled();
+        sgMail.send = originalImplementation;
         done();
       } catch (e) {
         done(e);
@@ -220,6 +239,84 @@ describe('authController', () => {
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'invalid token');
         expect(res.body).toHaveProperty('errorCode', 'PRT003');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  describe('changePassword', () => {
+    let subjectUser = sampleUsers[0];
+    let resetToken,
+      res,
+      userNewPassword = 'GniTset#395';
+    beforeAll(async () => {
+      await authHelper.resetDB();
+      const user = await userHelper.createUser({
+        user: subjectUser,
+        role: 'user',
+      });
+      await app
+        .post('/api/v1/auth/request_password_reset')
+        .send({ email: subjectUser.email });
+      const userPasswordReset = await db.PasswordReset.findOne({
+        where: { userId: user.id },
+      });
+      resetToken = userPasswordReset.resetToken;
+      res = await app
+        .patch(`/api/v1/auth/password/${resetToken}`)
+        .send({ password: userNewPassword });
+    });
+
+    it('returns status 200  and a success message when password update is successful', async (done) => {
+      try {
+        const successMsg = 'Your password was successfully updated';
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('message', successMsg);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('ensures user"s old password will fail login with status 401 and errorCode LGN002', async (done) => {
+      try {
+        const { email, password } = subjectUser;
+        const res = await app
+          .post('/api/v1/auth/login')
+          .send({ email, password });
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('errorCode', 'LGN002');
+        expect(res.body).toHaveProperty(
+          'error',
+          'Login failed. Invalid credentials.'
+        );
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('ensures user"s new password will pass login with status 200', async (done) => {
+      try {
+        const { email } = subjectUser;
+        const res = await app
+          .post('/api/v1/auth/login')
+          .send({ email, password: userNewPassword });
+        expect(res.status).toBe(200);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('prohibits repeated password update with same token, as token is destroyed on successful first attempt', async (done) => {
+      try {
+        res = await app
+          .patch(`/api/v1/auth/password/${resetToken}`)
+          .send({ password: userNewPassword });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invalid token');
+        // NOTE errorCode 'PRT002' means token is not found in the db
+        expect(res.body).toHaveProperty('errorCode', 'PRT002');
         done();
       } catch (e) {
         done(e);
