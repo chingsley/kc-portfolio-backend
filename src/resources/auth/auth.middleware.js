@@ -25,9 +25,11 @@ export default class AuthMiddleware extends AppMiddleware {
   static async validatePasswordResetDetails(req, res, next) {
     try {
       const schema = Joi.object({
-        resetToken: Joi.string().guid({
-          version: ['uuidv4', 'uuidv5'],
-        }),
+        resetToken: Joi.string()
+          .guid({
+            version: ['uuidv4', 'uuidv5'],
+          })
+          .required(),
         password: Joi.string().regex(PASSWORD_REGEX).required(),
       });
       const error = await validateSchema(schema, req);
