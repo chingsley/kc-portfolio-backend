@@ -1,4 +1,6 @@
-export default class AppMiddleware {
+import AppController from './app.controller';
+
+export default class AppMiddleware extends AppController {
   static validateImageUpload(req, res, next) {
     try {
       if (req.files) {

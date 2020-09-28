@@ -2,6 +2,7 @@ import Joi from '@hapi/joi';
 import AppMiddleware from '../app/app.middleware';
 import { validateSchema } from '../helpers';
 import { PASSWORD_REGEX } from '../user/user.middleware';
+import AuthService from './auth.services';
 
 export default class AuthMiddleware extends AppMiddleware {
   static async validateLoginDetails(req, res, next) {
@@ -38,5 +39,17 @@ export default class AuthMiddleware extends AppMiddleware {
     } catch (error) {
       return next(error.message);
     }
+  }
+
+  static authorize(arrayOfPermittedRoles) {
+    return async (req, res, next) => {
+      try {
+        const authService = new AuthService(req, res);
+        await authService.handleAuthorization(arrayOfPermittedRoles);
+        return next();
+      } catch (error) {
+        return AppMiddleware.handleError(error, req, res, next);
+      }
+    };
   }
 }
