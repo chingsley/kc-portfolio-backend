@@ -1,11 +1,6 @@
 import express from 'express';
-// import {
-//   accountOwner,
-//   admin,
-//   superadmin,
-//   user,
-// } from '../../utils/allowedRoles';
-// import AuthMiddleware from '../auth/auth.middleware';
+import { admin, superadmin } from '../../utils/allowedRoles';
+import AuthMiddleware from '../auth/auth.middleware';
 
 import UserController from './user.controller';
 import UserMiddleware from './user.middleware';
@@ -21,7 +16,7 @@ router.post(
 
 router.get(
   '/',
-  // AuthMiddleware.authorize([superadmin, admin]),
+  AuthMiddleware.authorize([superadmin, admin]),
   UserController.getAllUsers
 );
 
