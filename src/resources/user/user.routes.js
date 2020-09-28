@@ -1,4 +1,11 @@
 import express from 'express';
+// import {
+//   accountOwner,
+//   admin,
+//   superadmin,
+//   user,
+// } from '../../utils/allowedRoles';
+// import AuthMiddleware from '../auth/auth.middleware';
 
 import UserController from './user.controller';
 import UserMiddleware from './user.middleware';
@@ -12,6 +19,19 @@ router.post(
   UserController.registerUser
 );
 
-router.get('/', UserController.getAllUsers);
+router.get(
+  '/',
+  // AuthMiddleware.authorize([superadmin, admin]),
+  UserController.getAllUsers
+);
+
+// router.post(
+//   '/:username/:projectName',
+//   AuthMiddleware.authorize([admin, superadmin, accountOwner]),
+//   (req, res, next) => {
+//     console.log(req.params);
+//     res.send('testing.....');
+//   }
+// );
 
 export default router;

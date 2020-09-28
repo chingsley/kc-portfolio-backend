@@ -55,7 +55,7 @@ export default class UserService extends AppService {
   findBy = (field, value) => {
     return db.User.findOne({
       where: { [field]: value },
-      // include: [{ model: db.Project, as: 'projects' }],
+      include: [{ model: db.Role, as: 'role' }],
     });
   };
 
