@@ -10,10 +10,12 @@ import server from '../../src/server';
 import { sampleUsers, sampleUserImage } from './user.testSamples';
 import UserController from '../../src/resources/user/user.controller';
 import UserTestHelper from './user.testHelper';
+import AuthTestHelper from '../auth/auth.testHelper';
 
 const app = supertest(server.server);
 
 const userHelper = new UserTestHelper();
+const authHelper = new AuthTestHelper();
 
 describe('UserController', () => {
   describe('registerUser', () => {
@@ -153,11 +155,12 @@ describe('UserController', () => {
   });
 
   describe('getAllUsers', () => {
-    let res;
+    let res, adminToken;
     beforeAll(async () => {
       await userHelper.resetDB();
       await userHelper.createBulkUsers();
-      res = await app.get('/api/v1/users');
+      adminToken = await authHelper.mockTokenLevel('admin');
+      res = await app.get('/api/v1/users').set('authorization', adminToken);
     });
     it('returns 200 OK on successful fetch', async (done) => {
       try {
@@ -181,7 +184,9 @@ describe('UserController', () => {
     it('can paginates the result', async (done) => {
       try {
         const pageSize = 1;
-        const res = await app.get(`/api/v1/users?pageSize=${pageSize}&page=0`);
+        const res = await app
+          .get(`/api/v1/users?pageSize=${pageSize}&page=0`)
+          .set('authorization', adminToken);
         expect(res.body.data.count).toEqual(sampleUsers.length);
         expect(res.body.data.rows).toHaveLength(pageSize);
         done();
@@ -192,7 +197,9 @@ describe('UserController', () => {
     it('can filter the result by firstName', async (done) => {
       try {
         const firstNameLike = 'king';
-        const res = await app.get(`/api/v1/users?firstName=${firstNameLike}`);
+        const res = await app
+          .get(`/api/v1/users?firstName=${firstNameLike}`)
+          .set('authorization', adminToken);
         for (let user of res.body.data.rows) {
           expect(user.firstName).toMatch(firstNameLike);
         }
@@ -204,7 +211,9 @@ describe('UserController', () => {
     it('can filter the result by lastName', async (done) => {
       try {
         const lastNameLike = 'sn';
-        const res = await app.get(`/api/v1/users?lastName=${lastNameLike}`);
+        const res = await app
+          .get(`/api/v1/users?lastName=${lastNameLike}`)
+          .set('authorization', adminToken);
         for (let user of res.body.data.rows) {
           expect(user.lastName).toMatch(lastNameLike);
         }
@@ -216,7 +225,9 @@ describe('UserController', () => {
     it('can filter the result by username', async (done) => {
       try {
         const usernameLike = 'ene';
-        const res = await app.get(`/api/v1/users?username=${usernameLike}`);
+        const res = await app
+          .get(`/api/v1/users?username=${usernameLike}`)
+          .set('authorization', adminToken);
         for (let user of res.body.data.rows) {
           expect(user.username).toMatch(usernameLike);
         }
@@ -228,7 +239,9 @@ describe('UserController', () => {
     it('can filter the result by email', async (done) => {
       try {
         const emailLike = 'arya';
-        const res = await app.get(`/api/v1/users?email=${emailLike}`);
+        const res = await app
+          .get(`/api/v1/users?email=${emailLike}`)
+          .set('authorization', adminToken);
         for (let user of res.body.data.rows) {
           expect(user.email).toMatch(emailLike);
         }
