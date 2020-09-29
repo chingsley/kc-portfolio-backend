@@ -139,7 +139,7 @@ export default class AuthService extends UserService {
 
     const decodedToken = Jwt.verifyToken(token);
     if (!decodedToken) {
-      // failed to decode token with our jwt_secret
+      // invalid jwt token; failed to decode token with our jwt_secret
       this.throwError({
         status: 401,
         err: 'access denied',
