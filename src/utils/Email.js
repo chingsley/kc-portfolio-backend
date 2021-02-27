@@ -56,4 +56,32 @@ export default class Email {
 
     return msg;
   }
+
+  static getMsgTemplate(reqBody) {
+    const { email, message, name } = reqBody;
+    const msg = `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <style>
+        body {background-color: red; padding: 5px;}
+        div {color: white; padding: 15px; padding-left: 10px; width: 80%; border-radius: 5px;}
+      </style>
+    </head>
+    <body>
+      <div style="background-color: #130f40;">
+          <p>Hello, my name is ${name}</p>
+          <p>
+            ${message}
+          </p>
+          <p>
+            My email is ${email}
+          </p>
+        <div />
+    </body>
+  </html>
+  `;
+
+    return msg;
+  }
 }

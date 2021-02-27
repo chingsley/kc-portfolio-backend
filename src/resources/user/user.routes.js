@@ -29,4 +29,10 @@ router.get(
 //   }
 // );
 
+router.post(
+  '/:userId/send_mail',
+  UserMiddleware.validateMailSending,
+  UserController.sendUserMail
+);
+
 export default router;

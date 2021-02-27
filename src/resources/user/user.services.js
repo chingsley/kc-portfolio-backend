@@ -1,5 +1,6 @@
 import db from '../../database/models';
 import Cloudinary from '../../utils/Cloudinary';
+import Email from '../../utils/Email';
 import AppService from '../app/app.service';
 
 export default class UserService extends AppService {
@@ -30,6 +31,21 @@ export default class UserService extends AppService {
         { model: db.Project, as: 'projects' },
       ],
     });
+  };
+
+  sendUserMessage = async () => {
+    const { userId } = this.req.params;
+    const user = await this.findBy('id', userId);
+    if (user) {
+      const message = Email.getMsgTemplate(this.req.body);
+      await Email.send({ email: user.email, message, html: message });
+    } else {
+      this.throwError({
+        status: 409,
+        err: `no user matches the id of ${userId}`,
+      });
+    }
+    return user;
   };
 
   rejectDuplicateEmail = async (email) => {
