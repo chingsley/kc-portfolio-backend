@@ -1,11 +1,14 @@
 import supertest from 'supertest';
+import jwt from 'jsonwebtoken';
 import Joi from '@hapi/joi';
 import { v4 as uuidv4 } from 'uuid';
 
 import server from '../../src/server';
 import { sampleUsers } from '../user/user.testSamples';
+import AuthTestHelper from './auth.testHelper';
 
 const app = supertest(server.server);
+const authTestHelper = new AuthTestHelper();
 
 describe('authMiddleware', () => {
   const testCatchBlock = (method, url, payload) => {
@@ -134,6 +137,65 @@ describe('authMiddleware', () => {
     });
     testCatchBlock('patch', `/api/v1/auth/password/${uuidv4()}`, {
       password: 'Testing*123',
+    });
+  });
+
+  describe('authorize', () => {
+    it('returns errorCode AUTH001 when no token is provided', async (done) => {
+      try {
+        const res = await app.get('/api/v1/users');
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('error', 'access denied');
+        expect(res.body).toHaveProperty('errorCode', 'AUTH001');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('returns errorCode AUTH002 when invalid token is supplied', async (done) => {
+      try {
+        const res = await app
+          .get('/api/v1/users')
+          .set('authorization', 'INVALID_TOKEN');
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('error', 'access denied');
+        expect(res.body).toHaveProperty('errorCode', 'AUTH002');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('returns errorCode AUTH003 when an invalid uuid is signed in the token', async (done) => {
+      try {
+        const originalImplementation = jwt.verify;
+        jwt.verify = jest.fn().mockReturnValue({
+          subject: 'INVALID-UUID-VALUE',
+        });
+        const res = await app
+          .get('/api/v1/users')
+          .set('authorization', 'INVALID_TOKEN-CONTAINING-INVALID-UUID');
+        jwt.verify = originalImplementation;
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('error', 'access denied');
+        expect(res.body).toHaveProperty('errorCode', 'AUTH003');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    it('returns errorCode AUTH004 when user access right is not insufficient', async (done) => {
+      try {
+        const userToken = await authTestHelper.mockTokenLevel('user');
+        const res = await app
+          .get('/api/v1/users')
+          .set('authorization', userToken);
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('error', 'access denied');
+        expect(res.body).toHaveProperty('errorCode', 'AUTH004');
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
   });
 });

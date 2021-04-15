@@ -1,9 +1,8 @@
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const { log } = console;
 
 export default class Email {
-  FRONTEND_URL = 'localhost:3000/passwordreset';
-
   static async send({ email, message, html }) {
     try {
       if (!message && !html) {
@@ -19,10 +18,17 @@ export default class Email {
         text: message || html,
         html: html || '',
       };
+      // console.log(
+      //   'here................ 3',
+      //   process.env.NODE_ENV,
+      //   !process.env.NODE_ENV.match(/^production$|^test$/gi)
+      // );
       const result = await sgMail.send(msg);
-      const { log } = console;
-      process.env.NODE_ENV === 'development' && log(result);
+      !process.env.NODE_ENV?.match(/^production$|^test$/gi) &&
+        log(result, message);
     } catch (error) {
+      log('Error while sending email: ', error);
+
       return error;
     }
   }
@@ -43,6 +49,34 @@ export default class Email {
       <div style="background-color: #130f40;">
           <p>click the link below to reset your password</p>
           <a href="${process.env.HOST_URL_FRONTEND}/password/reset/${resetToken}">${process.env.HOST_URL_FRONTEND}/password/reset/${resetToken}</a>
+        <div />
+    </body>
+  </html>
+  `;
+
+    return msg;
+  }
+
+  static getMsgTemplate(reqBody) {
+    const { email, message, name } = reqBody;
+    const msg = `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <style>
+        body {background-color: red; padding: 5px;}
+        div {color: white; padding: 15px; padding-left: 10px; width: 80%; border-radius: 5px;}
+      </style>
+    </head>
+    <body>
+      <div style="background-color: #130f40;">
+          <p>Hello, my name is ${name}</p>
+          <p>
+            ${message}
+          </p>
+          <p>
+            My email is ${email}
+          </p>
         <div />
     </body>
   </html>

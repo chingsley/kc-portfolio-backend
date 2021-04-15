@@ -6,6 +6,7 @@ import Jwt from '../../utils/Jwt';
 import helper from '../../utils/helpers';
 import Email from '../../utils/Email';
 import UserService from '../user/user.services';
+import roles, { accountOwner } from '../../utils/allowedRoles';
 
 /**
  * AuthService inherits from UserSerice, while
@@ -69,13 +70,8 @@ export default class AuthService extends UserService {
 
   handleResetTokenValidation = async () => {
     const { token: resetToken } = this.req.headers;
-    const schema = Joi.object({
-      resetToken: Joi.string().guid({
-        version: ['uuidv4', 'uuidv5'],
-      }),
-    });
-    const { error } = schema.validate({ resetToken });
-    if (error)
+    const isValidUUID = this.validateUUID(resetToken);
+    if (!isValidUUID)
       // token is an invalid uuid value
       this.throwError({
         status: 400,
@@ -129,4 +125,78 @@ export default class AuthService extends UserService {
 
     return token;
   }
+
+  async handleAuthorization(permittedRoles) {
+    const { authorization: token } = this.req.headers;
+    if (!token) {
+      // no authorization token provided in req headers
+      this.throwError({
+        status: 401,
+        err: 'access denied',
+        errorCode: 'AUTH001',
+      });
+    }
+
+    const decodedToken = Jwt.verifyToken(token);
+    if (!decodedToken) {
+      // invalid jwt token; failed to decode token with our jwt_secret
+      this.throwError({
+        status: 401,
+        err: 'access denied',
+        errorCode: 'AUTH002',
+      });
+    }
+
+    const isValidUUID = this.validateUUID(decodedToken.subject);
+    if (!isValidUUID) {
+      // token contains an invalid uuid as subject
+      this.throwError({
+        status: 401,
+        err: 'access denied',
+        errorCode: 'AUTH003',
+      });
+    }
+
+    if (!permittedRoles.includes(decodedToken.role)) {
+      // user not allowed access; resource is classified
+      this.throwError({
+        status: 401,
+        err: 'access denied',
+        errorCode: 'AUTH004',
+      });
+    }
+
+    if (
+      permittedRoles.includes(accountOwner) &&
+      decodedToken.role == roles.user
+    ) {
+      const { username } = this.req.params;
+      if (!username) {
+        this.throwError({
+          status: 500,
+          err:
+            'invalid authorization setting, accountOwner role is not allowed when "username" is missing in params',
+        });
+      }
+      if (username !== decodedToken.username) {
+        // username does not match the resource owner's username, and role is not admin or superadmin
+        this.throwError({
+          status: 401,
+          err: 'access denied',
+          errorCode: 'AUTH005',
+        });
+      }
+    }
+    return true;
+  }
+
+  validateUUID = (value) => {
+    const schema = Joi.object({
+      uuid: Joi.string().guid({
+        version: ['uuidv4', 'uuidv5'],
+      }),
+    });
+    const { error } = schema.validate({ uuid: value });
+    return error ? false : true;
+  };
 }

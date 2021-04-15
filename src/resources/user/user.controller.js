@@ -37,4 +37,16 @@ export default class UserController extends AppController {
       UserController.handleError(error, req, res, next);
     }
   }
+
+  static async sendUserMail(req, res, next) {
+    try {
+      const userService = new UserService(req, res);
+      const recipient = await userService.sendUserMessage();
+      return res.json({
+        message: `Thank you. ${recipient.firstName} has been notified`,
+      });
+    } catch (error) {
+      UserController.handleError(error, req, res, next);
+    }
+  }
 }
