@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "build": "rm -rf dist && mkdir dist && babel src --copy-files --out-dir dist",
-    "start": "sequelize db:migrate && node dist/index.js",
+    "start": "node dist/index.js",
     "db:migrate:undo:prod": " sequelize db:migrate:undo:all --env production",
     "db:migrate:prod": "sequelize db:migrate --env production",
     "seed:prod": "sequelize db:seed:all --env production",
@@ -72,7 +72,7 @@
     "mysql2": "^2.1.0",
     "passport-jwt": "^4.0.0",
     "paymentsdk": "^1.0.2",
-    "pg": "^7.18.1",
+    "pg": "^8.6.0",
     "pg-hstore": "^2.3.3",
     "randomatic": "^3.1.1",
     "sendgrid": "^5.2.3",
